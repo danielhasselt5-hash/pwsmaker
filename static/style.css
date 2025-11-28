@@ -1,0 +1,13 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+canvas {
+    max-width: 1200px;
+    height: 500px !important;
+    /* Houdt grafiek groot */
+    margin: auto;
+}

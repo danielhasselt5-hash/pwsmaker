@@ -1,7 +1,7 @@
 async function fetchData() {
     const response = await fetch("/prijzen");
     const data = await response.json();
-    return Array.isArray(data) ? data : [];
+    return data || [];
 }
 
 function drawChart(data) {
@@ -10,42 +10,36 @@ function drawChart(data) {
         return;
     }
 
-    // Labels en prijzen per kwartier
-    const labels = data.map(entry => entry.datum_nl.split(" ")[1].slice(0, 5));
-    const prices = data.map(entry => parseFloat(entry.prijs_excl_belastingen.replace(",", ".")));
+    const labels = data.map(entry => entry.datum_nl.split(" ")[1].slice(0, 5)); // HH:MM
+    const prices = data.map(entry => entry.prijs_incl_btw);
 
-    // Gemiddelde berekenen
-    const avgPrice = prices.reduce((a, b) => a + b, 0) / prices.length;
+    const pointBackgroundColors = prices.map(p => p < 0.10 ? 'green' : 'red');
 
     const ctx = document.getElementById('prijsChart').getContext('2d');
-
     new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
-            datasets: [
-                {
-                    label: 'Prijs (€ per kWh)',
-                    data: prices,
-                    borderColor: 'blue',
-                    backgroundColor: prices.map(p => p < avgPrice ? 'rgba(0,255,0,0.3)' : 'rgba(255,0,0,0.3)'),
-                    fill: true,
-                    tension: 0.3,
-                    pointRadius: 3
-                },
-                {
-                    label: 'Gemiddelde prijs',
-                    data: Array(prices.length).fill(avgPrice),
-                    borderColor: 'orange',
-                    borderDash: [5, 5],
-                    fill: false,
-                    pointRadius: 0
-                }
-            ]
+            datasets: [{
+                label: 'Prijs totaal incl. btw (€ per kWh)',
+                data: prices,
+                borderColor: 'blue',
+                backgroundColor: 'rgba(0,0,0,0)', // geen body color
+                tension: 0.3,
+                fill: false, // body niet invullen
+                pointRadius: 6,
+                pointBackgroundColor: pointBackgroundColors
+            }, {
+                label: 'Gemiddelde prijs',
+                data: Array(prices.length).fill(prices.reduce((a, b) => a + b, 0) / prices.length),
+                borderColor: 'orange',
+                borderDash: [5, 5],
+                fill: false,
+                pointRadius: 0
+            }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
             plugins: {
                 legend: { display: true },
                 tooltip: {

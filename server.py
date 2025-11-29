@@ -17,7 +17,12 @@ def fetch_prices(period="vandaag"):
     }
     response = requests.get(API_URL, params=params)
     response.raise_for_status()
-    return response.json()  # hele lijst teruggeven
+    data = response.json()
+    # Voeg totaalprijs incl. btw toe
+    for entry in data:
+        prijs_excl = float(entry["prijs_excl_belastingen"].replace(",", "."))
+        entry["prijs_incl_btw"] = round(prijs_excl * 1.21, 6)  # 21% btw
+    return data
 
 @app.route("/")
 def index():
@@ -29,7 +34,7 @@ def prijzen_vandaag():
         data = fetch_prices("vandaag")
         return jsonify(data)
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": str(e)})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(debug=True)

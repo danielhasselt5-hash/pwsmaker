@@ -3,16 +3,17 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elektriciteitsprijzen</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Energieprijzen</title>
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
-    <h1>Elektriciteitsprijzen vandaag</h1>
-    <canvas id="prijsChart"></canvas>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <h1>Energieprijzen Vandaag (incl. btw)</h1>
+    <div class="chart-container">
+        <canvas id="prijsChart"></canvas>
+    </div>
+    <script src="script.js"></script>
 </body>
 
 </html>

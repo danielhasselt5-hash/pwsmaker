@@ -20,7 +20,6 @@ def fetch_prices(period="vandaag"):
     response = requests.get(API_URL, params=params)
     response.raise_for_status()
     data = response.json()
-    # Voeg totaalprijs incl btw toe
     for entry in data:
         prijs_excl = float(entry["prijs_excl_belastingen"].replace(",", "."))
         entry["prijs_totaal"] = round(prijs_excl * 1.21, 4)

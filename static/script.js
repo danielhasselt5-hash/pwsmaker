@@ -10,34 +10,43 @@ function drawChart(data) {
         return;
     }
 
+    // Labels (tijdstippen)
     const labels = data.map(entry => entry.datum_nl.split(" ")[1].slice(0, 5)); // HH:MM
+
+    // Prijzen totaal incl. btw
     const prices = data.map(entry => entry.prijs_totaal);
 
-    const pointBackgroundColors = prices.map(p => p < 0.10 ? 'green' : 'red');
+    // Gemiddelde prijs
+    const avgPrice = prices.reduce((a, b) => a + b, 0) / prices.length;
+
+    // Puntkleuren: rood boven gemiddelde, groen onder
+    const pointBackgroundColors = prices.map(p => p > avgPrice ? 'red' : 'green');
 
     const ctx = document.getElementById('prijsChart').getContext('2d');
     new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
-            datasets: [{
-                label: 'Prijs totaal incl. btw (€ per kWh)',
-                data: prices,
-                borderColor: 'blue',
-                backgroundColor: 'rgba(0,0,0,0)',
-                tension: 0.3,
-                fill: false,
-                pointRadius: 6,
-                pointBackgroundColor: pointBackgroundColors,
-                pointHoverRadius: 10
-            }, {
-                label: 'Gemiddelde prijs',
-                data: Array(prices.length).fill(prices.reduce((a, b) => a + b, 0) / prices.length),
-                borderColor: 'orange',
-                borderDash: [5, 5],
-                fill: false,
-                pointRadius: 0
-            }]
+            datasets: [
+                {
+                    label: 'Prijs totaal incl. btw (€ per kWh)',
+                    data: prices,
+                    borderColor: 'blue',
+                    backgroundColor: 'rgba(0,0,0,0)', // geen body kleur
+                    tension: 0.3,
+                    fill: false, // body niet invullen
+                    pointRadius: 6,
+                    pointBackgroundColor: pointBackgroundColors
+                },
+                {
+                    label: 'Gemiddelde prijs',
+                    data: Array(prices.length).fill(avgPrice),
+                    borderColor: 'orange',
+                    borderDash: [5, 5],
+                    fill: false,
+                    pointRadius: 0
+                }
+            ]
         },
         options: {
             responsive: true,

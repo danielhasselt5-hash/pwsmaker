@@ -21,13 +21,15 @@ def fetch_prices(period="vandaag"):
     response.raise_for_status()
     data = response.json()
 
+    # Bereken totaalprijs incl. btw
     for entry in data:
-        energiebelasting = float(entry["prijs_excl_belastingen"].replace(",", "."))
-        inkoopvergoeding = float(entry.get("inkoopvergoeding", 0))
-        marktprijs = float(entry.get("marktprijs", 0))
-        totaal = (energiebelasting + inkoopvergoeding + marktprijs) * 1.21
-        entry["prijs_totaal"] = round(totaal, 4)
-
+        try:
+            energiebelasting = float(entry.get("energiebelasting", "0").replace(",", "."))
+            inkoopvergoeding = float(entry.get("inkoopvergoeding", "0").replace(",", "."))
+            marktprijs = float(entry.get("marktprijs", "0").replace(",", "."))
+            entry["prijs_totaal"] = round((energiebelasting + inkoopvergoeding + marktprijs) * 1.21, 4)
+        except Exception as e:
+            entry["prijs_totaal"] = 0.0  # fallback
     return data
 
 @app.route("/")
@@ -43,5 +45,6 @@ def prijzen_vandaag():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
+    # Render geeft poort op via environment variable PORT
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)

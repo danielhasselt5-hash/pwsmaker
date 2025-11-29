@@ -20,9 +20,14 @@ def fetch_prices(period="vandaag"):
     response = requests.get(API_URL, params=params)
     response.raise_for_status()
     data = response.json()
+
     for entry in data:
-        prijs_excl = float(entry["prijs_excl_belastingen"].replace(",", "."))
-        entry["prijs_totaal"] = round(prijs_excl * 1.21, 4)
+        energiebelasting = float(entry["prijs_excl_belastingen"].replace(",", "."))
+        inkoopvergoeding = float(entry.get("inkoopvergoeding", 0))
+        marktprijs = float(entry.get("marktprijs", 0))
+        totaal = (energiebelasting + inkoopvergoeding + marktprijs) * 1.21
+        entry["prijs_totaal"] = round(totaal, 4)
+
     return data
 
 @app.route("/")
@@ -38,6 +43,5 @@ def prijzen_vandaag():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    # Render geeft poort op via environment variable PORT
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)

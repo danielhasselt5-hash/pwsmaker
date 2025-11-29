@@ -10,7 +10,7 @@ function drawChart(data) {
         return;
     }
 
-    const labels = data.map(entry => entry.datum_nl.split(" ")[1].slice(0, 5));
+    const labels = data.map(entry => entry.datum_nl.split(" ")[1].slice(0, 5)); // HH:MM
     const prices = data.map(entry => entry.prijs_totaal);
 
     const pointBackgroundColors = prices.map(p => p < 0.10 ? 'green' : 'red');
@@ -20,27 +20,24 @@ function drawChart(data) {
         type: 'line',
         data: {
             labels: labels,
-            datasets: [
-                {
-                    label: 'Prijs totaal incl. btw (€ per kWh)',
-                    data: prices,
-                    borderColor: 'blue',
-                    backgroundColor: 'rgba(0,0,0,0)', // geen body color
-                    tension: 0.3,
-                    fill: false,
-                    pointRadius: 6,
-                    pointBackgroundColor: pointBackgroundColors,
-                    pointHoverRadius: 10
-                },
-                {
-                    label: 'Gemiddelde prijs',
-                    data: Array(prices.length).fill(prices.reduce((a, b) => a + b, 0) / prices.length),
-                    borderColor: 'orange',
-                    borderDash: [5, 5],
-                    fill: false,
-                    pointRadius: 0
-                }
-            ]
+            datasets: [{
+                label: 'Prijs totaal incl. btw (€ per kWh)',
+                data: prices,
+                borderColor: 'blue',
+                backgroundColor: 'rgba(0,0,0,0)',
+                tension: 0.3,
+                fill: false,
+                pointRadius: 6,
+                pointBackgroundColor: pointBackgroundColors,
+                pointHoverRadius: 10
+            }, {
+                label: 'Gemiddelde prijs',
+                data: Array(prices.length).fill(prices.reduce((a, b) => a + b, 0) / prices.length),
+                borderColor: 'orange',
+                borderDash: [5, 5],
+                fill: false,
+                pointRadius: 0
+            }]
         },
         options: {
             responsive: true,

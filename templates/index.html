@@ -1,19 +1,25 @@
 <!DOCTYPE html>
 <html lang="nl">
-
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Energieprijzen</title>
-    <link rel="stylesheet" href="style.css">
+
+    <!-- CSS altijd via /static/... -->
+    <link rel="stylesheet" href="/static/style.css">
+
+    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
     <h1>Energieprijzen Vandaag (incl. btw)</h1>
+
     <div class="chart-container">
         <canvas id="prijsChart"></canvas>
     </div>
-    <script src="script.js"></script>
-</body>
 
+    <!-- JS altijd via /static/... -->
+    <script src="/static/script.js"></script>
+</body>
 </html>

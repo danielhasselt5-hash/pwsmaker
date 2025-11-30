@@ -10,11 +10,11 @@ function drawChart(data) {
         return;
     }
 
-    const labels = data.map(entry => entry.datum_nl.split(" ")[1].slice(0, 5));
+    const labels = data.map(entry => entry.datum_nl.split(" ")[1].slice(0, 5)); // HH:MM
     const prices = data.map(entry => entry.prijs_totaal);
 
     const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
-    const pointColors = prices.map(p => p > avg ? 'red' : 'green');
+    const pointColors = prices.map(p => p >= avg ? 'red' : 'green');
 
     const ctx = document.getElementById('prijsChart').getContext('2d');
     new Chart(ctx, {
@@ -27,8 +27,8 @@ function drawChart(data) {
                     data: prices,
                     borderColor: 'blue',
                     backgroundColor: 'rgba(0,0,0,0)',
-                    tension: 0.3,
                     fill: false,
+                    tension: 0.3,
                     pointRadius: 6,
                     pointBackgroundColor: pointColors
                 },
@@ -55,8 +55,13 @@ function drawChart(data) {
                 }
             },
             scales: {
-                y: { beginAtZero: false, title: { display: true, text: 'Prijs (€ per kWh)' } },
-                x: { title: { display: true, text: 'Uur' } }
+                y: {
+                    beginAtZero: false,
+                    title: { display: true, text: 'Prijs (€ per kWh)' }
+                },
+                x: {
+                    title: { display: true, text: 'Uur' }
+                }
             }
         }
     });

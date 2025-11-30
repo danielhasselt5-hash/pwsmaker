@@ -1,20 +1,20 @@
 async function fetchData() {
     const response = await fetch("/prijzen");
     const data = await response.json();
-    return data || [];
-}
 
-function drawChart(data) {
-    if (data.length === 0) {
-        alert("Geen prijsdata gevonden!");
-        return;
-    }
+    // Bereken prijs totaal volgens de nieuwe formule
+    const prijzen = data.map(d => {
+        const prijs_excl = parseFloat(d.prijs_excl_belastingen.replace(',', '.'));
+        return (prijs_excl + 0.0220 + 0.1015) * 1.21;
+    });
 
-    const prices = data.map(entry => entry.prijs_totaal);
-    const labels = data.map(entry => entry.datum_nl.split(" ")[1].slice(0, 5));
-    const avgPrice = prices.reduce((a, b) => a + b, 0) / prices.length;
+    const labels = data.map(d => d.datum_nl);
 
-    const pointColors = prices.map(p => p >= avgPrice ? 'red' : 'green');
+    // Gemiddelde berekenen
+    const gemiddelde = prijzen.reduce((a, b) => a + b, 0) / prijzen.length;
+
+    // Kleuren voor kwartierspunten bepalen
+    const pointColors = prijzen.map(p => p > gemiddelde ? 'red' : 'green');
 
     const ctx = document.getElementById('prijsChart').getContext('2d');
     new Chart(ctx, {
@@ -23,48 +23,47 @@ function drawChart(data) {
             labels: labels,
             datasets: [
                 {
-                    label: 'Prijs totaal incl. btw (€ per kWh)',
-                    data: prices,
+                    label: 'Prijs per kwartier',
+                    data: prijzen,
                     borderColor: 'blue',
-                    backgroundColor: 'rgba(0,0,0,0)',
+                    backgroundColor: 'transparent', // geen vulling
                     fill: false,
-                    tension: 0.3,
-                    pointRadius: 6,
-                    pointBackgroundColor: pointColors
+                    pointBackgroundColor: pointColors,
+                    tension: 0.1
                 },
                 {
-                    label: 'Gemiddelde prijs',
-                    data: Array(prices.length).fill(avgPrice),
+                    label: 'Gemiddelde',
+                    data: Array(prijzen.length).fill(gemiddelde),
                     borderColor: 'orange',
-                    borderDash: [5, 5],
+                    borderDash: [5, 5], // gebroken lijn
                     fill: false,
-                    pointRadius: 0
+                    pointRadius: 0 // geen punten voor gemiddelde lijn
                 }
             ]
         },
         options: {
             responsive: true,
             plugins: {
-                legend: { display: true },
-                tooltip: {
-                    callbacks: {
-                        label: function (context) {
-                            return context.parsed.y.toFixed(4) + " €";
-                        }
-                    }
+                legend: {
+                    display: true
                 }
             },
             scales: {
-                y: { beginAtZero: false, title: { display: true, text: 'Prijs (€ per kWh)' } },
-                x: { title: { display: true, text: 'Uur' } }
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Prijs (€)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Tijd'
+                    }
+                }
             }
         }
     });
 }
 
-async function init() {
-    const data = await fetchData();
-    drawChart(data);
-}
-
-init();
+fetchData();

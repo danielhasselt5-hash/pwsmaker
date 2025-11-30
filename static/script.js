@@ -1,69 +1,57 @@
-async function fetchData() {
-    const response = await fetch("/prijzen");
-    const data = await response.json();
+fetch("/prijzen")
+    .then(response => response.json())
+    .then(data => {
+        const ctx = document.getElementById('prijsChart').getContext('2d');
 
-    // Bereken prijs totaal volgens de nieuwe formule
-    const prijzen = data.map(d => {
-        const prijs_excl = parseFloat(d.prijs_excl_belastingen.replace(',', '.'));
-        return (prijs_excl + 0.0220 + 0.1015) * 1.21;
-    });
+        const gemiddelde = data.gemiddelde;
+        const kleuren = data.prijzen.map(p => p > gemiddelde ? 'red' : 'green');
 
-    const labels = data.map(d => d.datum_nl);
-
-    // Gemiddelde berekenen
-    const gemiddelde = prijzen.reduce((a, b) => a + b, 0) / prijzen.length;
-
-    // Kleuren voor kwartierspunten bepalen
-    const pointColors = prijzen.map(p => p > gemiddelde ? 'red' : 'green');
-
-    const ctx = document.getElementById('prijsChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Prijs per kwartier',
-                    data: prijzen,
-                    borderColor: 'blue',
-                    backgroundColor: 'transparent', // geen vulling
-                    fill: false,
-                    pointBackgroundColor: pointColors,
-                    tension: 0.1
-                },
-                {
-                    label: 'Gemiddelde',
-                    data: Array(prijzen.length).fill(gemiddelde),
-                    borderColor: 'orange',
-                    borderDash: [5, 5], // gebroken lijn
-                    fill: false,
-                    pointRadius: 0 // geen punten voor gemiddelde lijn
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    display: true
-                }
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.labels,
+                datasets: [
+                    {
+                        label: 'Kwartiersprijs',
+                        data: data.prijzen,
+                        borderColor: 'blue',
+                        backgroundColor: 'rgba(0,0,255,0.1)',
+                        fill: true,
+                        pointBackgroundColor: kleuren,
+                        pointRadius: 5,
+                        tension: 0.2
+                    },
+                    {
+                        label: 'Gemiddelde',
+                        data: Array(data.prijzen.length).fill(gemiddelde),
+                        borderColor: 'orange',
+                        borderDash: [10, 5],
+                        fill: false,
+                        pointRadius: 0
+                    }
+                ]
             },
-            scales: {
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Prijs (€)'
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
                     }
                 },
-                x: {
-                    title: {
+                scales: {
+                    x: {
                         display: true,
-                        text: 'Tijd'
+                        title: { display: true, text: 'Tijd' }
+                    },
+                    y: {
+                        display: true,
+                        title: { display: true, text: 'Prijs (€)' }
                     }
                 }
             }
-        }
+        });
     });
-}
-
-fetchData();

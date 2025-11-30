@@ -1,23 +1,18 @@
-/* Algemene pagina instellingen */
 body {
     font-family: Arial, sans-serif;
     margin: 20px;
     background-color: #f5f5f5;
+}
+
+h1 {
+    text-align: center;
     color: #333;
 }
 
-/* Titel styling */
-h1 {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-/* Canvas styling */
 canvas {
+    background-color: #fff;
+    border: 1px solid #ccc;
     display: block;
-    margin: 0 auto;
-    background-color: #ffffff;
-    border: 1px solid #ddd;
+    margin: 20px auto;
     padding: 10px;
-    border-radius: 8px;
 }

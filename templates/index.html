@@ -3,20 +3,19 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Energieprijzen Dashboard</title>
+    <title>Energieprijzen Vandaag (incl. btw)</title>
+    <!-- Verwijzing naar CSS in de static folder -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
     <h1>Energieprijzen Vandaag (incl. btw)</h1>
-
-    <div class="chart-wrapper">
-        <div class="chart-container">
-            <canvas id="prijsChart"></canvas>
-        </div>
+    <div class="chart-container">
+        <canvas id="prijsChart"></canvas>
     </div>
 
+    <!-- Verwijzing naar JS in de static folder -->
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 

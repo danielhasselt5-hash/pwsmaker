@@ -10,39 +10,54 @@ function drawChart(data) {
         return;
     }
 
-    const labels = data.map(e => e.datum_nl.split(" ")[1].slice(0, 5));
-    const prices = data.map(e => e.prijs_incl_btw);
+    const labels = data.map(entry => entry.datum_nl.split(" ")[1].slice(0, 5));
+    const prices = data.map(entry => entry.prijs_totaal);
 
     const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
-
-    const pointColors = prices.map(p => p > avg ? "red" : "green");
+    const pointColors = prices.map(p => p > avg ? 'red' : 'green');
 
     const ctx = document.getElementById('prijsChart').getContext('2d');
     new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
-            datasets: [{
-                label: 'Prijs incl. btw (€ per kWh)',
-                data: prices,
-                borderColor: 'blue',
-                backgroundColor: 'rgba(0,0,0,0)',
-                tension: 0.3,
-                fill: false,
-                pointRadius: 6,
-                pointBackgroundColor: pointColors
-            },
-            {
-                label: 'Gemiddelde prijs',
-                data: Array(prices.length).fill(avg),
-                borderColor: 'orange',
-                borderDash: [5, 5],
-                pointRadius: 0,
-                fill: false
-            }]
+            datasets: [
+                {
+                    label: 'Prijs totaal incl. btw (€ per kWh)',
+                    data: prices,
+                    borderColor: 'blue',
+                    backgroundColor: 'rgba(0,0,0,0)',
+                    tension: 0.3,
+                    fill: false,
+                    pointRadius: 6,
+                    pointBackgroundColor: pointColors
+                },
+                {
+                    label: 'Gemiddelde prijs',
+                    data: Array(prices.length).fill(avg),
+                    borderColor: 'orange',
+                    borderDash: [5, 5],
+                    fill: false,
+                    pointRadius: 0
+                }
+            ]
         },
         options: {
-            responsive: true
+            responsive: true,
+            plugins: {
+                legend: { display: true },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return context.parsed.y.toFixed(4) + " €";
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: { beginAtZero: false, title: { display: true, text: 'Prijs (€ per kWh)' } },
+                x: { title: { display: true, text: 'Uur' } }
+            }
         }
     });
 }

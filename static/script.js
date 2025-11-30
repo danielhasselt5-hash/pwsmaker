@@ -10,11 +10,11 @@ function drawChart(data) {
         return;
     }
 
-    const labels = data.map(entry => entry.datum_nl.split(" ")[1].slice(0, 5)); // HH:MM
     const prices = data.map(entry => entry.prijs_totaal);
+    const labels = data.map(entry => entry.datum_nl.split(" ")[1].slice(0, 5));
+    const avgPrice = prices.reduce((a, b) => a + b, 0) / prices.length;
 
-    const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
-    const pointColors = prices.map(p => p >= avg ? 'red' : 'green');
+    const pointColors = prices.map(p => p >= avgPrice ? 'red' : 'green');
 
     const ctx = document.getElementById('prijsChart').getContext('2d');
     new Chart(ctx, {
@@ -34,7 +34,7 @@ function drawChart(data) {
                 },
                 {
                     label: 'Gemiddelde prijs',
-                    data: Array(prices.length).fill(avg),
+                    data: Array(prices.length).fill(avgPrice),
                     borderColor: 'orange',
                     borderDash: [5, 5],
                     fill: false,
@@ -55,13 +55,8 @@ function drawChart(data) {
                 }
             },
             scales: {
-                y: {
-                    beginAtZero: false,
-                    title: { display: true, text: 'Prijs (€ per kWh)' }
-                },
-                x: {
-                    title: { display: true, text: 'Uur' }
-                }
+                y: { beginAtZero: false, title: { display: true, text: 'Prijs (€ per kWh)' } },
+                x: { title: { display: true, text: 'Uur' } }
             }
         }
     });

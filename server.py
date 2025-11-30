@@ -8,7 +8,7 @@ load_dotenv()
 API_KEY = os.getenv("JEROEN_API_KEY")
 API_URL = "https://jeroen.nl/api/dynamische-energieprijzen/v2/"
 
-app = Flask(__name__, static_folder="static", template_folder="templates")
+app = Flask(__name__)
 
 def fetch_prices(period="vandaag"):
     """Haalt prijzen op en berekent totaal incl. 21% btw."""
@@ -20,15 +20,13 @@ def fetch_prices(period="vandaag"):
     response = requests.get(API_URL, params=params)
     response.raise_for_status()
     data = response.json()
-
+    # Voeg totaalprijs incl btw toe
     for entry in data:
-        # Gebruik alle componenten + 21% btw
-        prijs_excl = (
-            float(entry["energiebelasting"].replace(",", ".")) +
-            float(entry["inkoopvergoeding"].replace(",", ".")) +
-            float(entry["marktprijs"].replace(",", "."))
-        )
-        entry["prijs_totaal"] = round(prijs_excl * 1.21, 4)
+        # Totaal = energiebelasting + inkoopvergoeding + marktprijs, dan keer 1,21
+        prijs_total = float(entry.get("energiebelasting", "0").replace(",", ".")) \
+                     + float(entry.get("inkoopvergoeding", "0").replace(",", ".")) \
+                     + float(entry.get("marktprijs", "0").replace(",", "."))
+        entry["prijs_totaal"] = round(prijs_total * 1.21, 4)
     return data
 
 @app.route("/")
